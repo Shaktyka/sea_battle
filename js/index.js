@@ -20,22 +20,34 @@ const play = {
     shot.textContent = this.shot;
     hit.textContent = this.hit;
     dead.textContent = this.dead;
+  },
+  restart() {
+    this.play = 0;
+    this.record = 0;
+    this.shot = 0;
+    this.dead = 0;
   }
 };
 
 // Реакция на выстрел
 const show = {
-  hit() {
-
+  hit(elem) {
+    if (!elem.classList.contains('hit')) {
+      this.changeClass(elem, 'hit');
+      // play.updateData = 'shot';
+    }
   },
   miss(elem) {
     if (!elem.classList.contains('miss')) {
       this.changeClass(elem, 'miss');
-      play.updateData = 'shot';
+      // play.updateData = 'shot';
     }
   },
-  dead() {
-
+  dead(elem) {
+    if (!elem.classList.contains('dead')) {
+      this.changeClass(elem, 'dead');
+      // play.updateData = 'shot';
+    }
   },
   changeClass(elem, classValue) {
     elem.className = classValue;
@@ -45,12 +57,35 @@ const show = {
 // Выстрел
 const fire = (evt) => {
     const target = evt.target;
+
+    if (target.classList.length > 0 || target.tagName !== 'TD') return;
+
     show.miss(target);
+    play.updateData = 'shot';
+};
+
+// Очистка поля
+const clearField = () => {
+  const tds = enemy.querySelectorAll('td');
+  tds.forEach((td) => {
+    td.className = '';
+  });
+};
+
+// Рестарт игры
+const restart = (evt) => {
+  evt.preventDefault();
+  clearField();
+
+  play.restart();
+  play.render();
 };
 
 // Старт игры
 const init = () => {
   enemy.addEventListener('click', fire);
+
+  againBtn.addEventListener('click', restart);
 };
 
 init();
