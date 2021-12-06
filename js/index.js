@@ -4,6 +4,29 @@ const hit = document.getElementById('hit');
 const dead = document.getElementById('dead');
 const enemy = document.getElementById('enemy');
 const againBtn = document.getElementById('again');
+const title = document.querySelector('.header');
+
+const game = {
+  ships: [
+    {
+      location: ['26', '36', '46', '56'],
+      hit: ['', '', '', '']
+    },
+    {
+      location: ['11', '12', '13'],
+      hit: ['', '', '']
+    },
+    {
+      location: ['69', '79'],
+      hit: ['', '']
+    },
+    {
+      location: ['90'],
+      hit: ['']
+    }
+  ],
+  shipCount: 4
+};
 
 // Состояние игры
 const play = {
@@ -22,32 +45,24 @@ const play = {
     dead.textContent = this.dead;
   },
   restart() {
-    this.play = 0;
     this.record = 0;
     this.shot = 0;
+    this.hit = 0;
     this.dead = 0;
+    this.shipCount = 4;
   }
 };
 
 // Реакция на выстрел
 const show = {
   hit(elem) {
-    if (!elem.classList.contains('hit')) {
-      this.changeClass(elem, 'hit');
-      // play.updateData = 'shot';
-    }
+    this.changeClass(elem, 'hit');
   },
   miss(elem) {
-    if (!elem.classList.contains('miss')) {
-      this.changeClass(elem, 'miss');
-      // play.updateData = 'shot';
-    }
+    this.changeClass(elem, 'miss');
   },
   dead(elem) {
-    if (!elem.classList.contains('dead')) {
-      this.changeClass(elem, 'dead');
-      // play.updateData = 'shot';
-    }
+    this.changeClass(elem, 'dead');
   },
   changeClass(elem, classValue) {
     elem.className = classValue;
@@ -62,6 +77,33 @@ const fire = (evt) => {
 
     show.miss(target);
     play.updateData = 'shot';
+
+    // Проверяет, не попали ли в корабль
+    for (let i = 0; i < game.ships.length; i++) {
+      const ship = game.ships[i];
+      const index = ship.location.indexOf(target.id); // индекс элемента массива из location корабля
+      
+      if (index >= 0) {
+        show.hit(target);
+        play.updateData = 'hit';
+        ship.hit[index] = 'x';
+
+        const life = ship.hit.indexOf('');
+        if (life < 0) {
+          play.updateData = 'dead';
+          for (const id of ship.location) {
+            show.dead(document.getElementById(id));
+          }
+
+          game.shipCount -= 1;
+
+          if (game.shipCount < 1) {
+            title.textContent = 'Игра окончена!';
+            title.style.color = 'red';
+          }
+        }
+      }
+    }
 };
 
 // Очистка поля
@@ -79,6 +121,9 @@ const restart = (evt) => {
 
   play.restart();
   play.render();
+
+  title.textContent = 'SEA BATTLE';
+  title.style.color = 'black';
 };
 
 // Старт игры
