@@ -30,7 +30,7 @@ const game = {
 
 // Состояние игры
 const play = {
-  record: 0,
+  record: localStorage.getItem('seaBattleRecord') || 0,
   shot: 0,
   hit: 0,
   dead: 0,
@@ -45,7 +45,7 @@ const play = {
     dead.textContent = this.dead;
   },
   restart() {
-    this.record = 0;
+    this.record = localStorage.getItem('seaBattleRecord') || 0;
     this.shot = 0;
     this.hit = 0;
     this.dead = 0;
@@ -73,7 +73,11 @@ const show = {
 const fire = (evt) => {
     const target = evt.target;
 
-    if (target.classList.length > 0 || target.tagName !== 'TD') return;
+    if (
+        target.classList.length > 0 || 
+        target.tagName !== 'TD' ||
+        title.textContent === 'Игра окончена!'
+    ) return;
 
     show.miss(target);
     play.updateData = 'shot';
@@ -100,6 +104,12 @@ const fire = (evt) => {
           if (game.shipCount < 1) {
             title.textContent = 'Игра окончена!';
             title.style.color = 'red';
+
+            if (play.shot < play.record || play.record === 0) {
+              localStorage.setItem('seaBattleRecord', play.shot);
+              play.record = play.shot;
+              play.render();
+            }
           }
         }
       }
@@ -124,13 +134,16 @@ const restart = (evt) => {
 
   title.textContent = 'SEA BATTLE';
   title.style.color = 'black';
+
+  // Самое простое:
+  // location.reload();
 };
 
 // Старт игры
 const init = () => {
   enemy.addEventListener('click', fire);
-
   againBtn.addEventListener('click', restart);
+  play.render();
 };
 
 init();
