@@ -76,7 +76,7 @@ const fire = (evt) => {
     if (
         target.classList.length > 0 || 
         target.tagName !== 'TD' ||
-        title.textContent === 'Игра окончена!'
+        !game.shipCount
     ) return;
 
     show.miss(target);
@@ -101,7 +101,7 @@ const fire = (evt) => {
 
           game.shipCount -= 1;
 
-          if (game.shipCount < 1) {
+          if (!game.shipCount) {
             title.textContent = 'Игра окончена!';
             title.style.color = 'red';
 
